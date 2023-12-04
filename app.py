@@ -36,7 +36,7 @@ zeroIgnore = 0
 last_predict = 0
 
 #how certain the model has to be in order to print
-certainty_threshold = 0.4
+certainty_threshold = 0.1
 
 def initMnist(epochs):
     global inputArray
@@ -88,7 +88,13 @@ def mnistPredict():
     #get prediction array, most probable number and certainty from neural network
     prediction = net.predict(mn.network, inputArray)
     number = np.argmax(prediction)
-    certainty = prediction[number]
+
+    # find percent certainty
+    valueSum = 0
+    for v in prediction:
+        for k in v:
+            valueSum += k
+    certainty = (int(prediction[number]) / valueSum) * 50
 
     #set zeroInore to certainty to cancel zeros when input array is empty
     if zeroIgnore == 0:
@@ -98,12 +104,12 @@ def mnistPredict():
     inputArray = inputArray.reshape(28, 28)
 
     #return prediction
-    if certainty > certainty_threshold and certainty != zeroIgnore and number != last_predict:
+    if certainty > certainty_threshold and certainty != last_predict:
         #print prediction
-        print(Fore.GREEN + str(number) + Fore.CYAN + ", " + str(certainty))
+        print(Fore.GREEN + str(number) + Fore.CYAN + ", " + str(certainty) + "% certainty")
 
         #store certainy to avoid printing again
-        last_predict = number
+        last_predict = certainty
 
         return number
     
