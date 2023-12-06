@@ -12,10 +12,11 @@ from keras.datasets import mnist
 
 pygame.init()
 
-#pygame settings
-screen = pygame.display.set_mode((650, 561))
-white = [55, 55, 55]
-screen.fill(white)
+#screen settings
+screen = pygame.display.set_mode((700, 561))
+backgroundColor = [55, 55, 55]
+screen.fill(backgroundColor)
+
 appRunning = True
 delta_time = 0.0
 clock = pygame.time.Clock()
@@ -29,14 +30,11 @@ inputArray = np.zeros((28, 28))
 #check for interval to predict value
 prediction_counter = 0
 
-#ignore printing 0 when input array is empty
-zeroIgnore = 0
+#-----FOR TESTING PURPOSES------
+trainingSetCounter = 300
+#-------------------------------
 
-#ignroe repeated predictions
-last_predict = 0
 
-#how certain the model has to be in order to print
-certainty_threshold = 0.1
 
 def initMnist(epochs):
     global inputArray
@@ -69,7 +67,7 @@ def drawInputArray():
 
 def predictRepeat():
     global prediction_counter
-    if(prediction_counter%60 == 0): 
+    if(prediction_counter%144 == 0): 
         mnistPredict()
         prediction_counter = 1
     else: prediction_counter += 1
@@ -78,8 +76,6 @@ def predictRepeat():
 #input users number into neural network, then output and return prediction
 def mnistPredict():
     global inputArray
-    global zeroIgnore
-    global last_predict
     
     # Ensure inputArray is a NumPy array and has the correct shape
     inputArray = inputArray.reshape(784, 1)
@@ -89,32 +85,29 @@ def mnistPredict():
     prediction = net.predict(mn.network, inputArray)
     number = np.argmax(prediction)
 
-    # find percent certainty
-    valueSum = 0
-    for v in prediction:
-        for k in v:
-            valueSum += k
-    certainty = (int(prediction[number]) / valueSum) * 50
-
-    #set zeroInore to certainty to cancel zeros when input array is empty
-    if zeroIgnore == 0:
-        zeroIgnore = certainty
-
     #reset to original shape
     inputArray = inputArray.reshape(28, 28)
 
+    #print prediction
+    print(Fore.GREEN + str(number))
+
     #return prediction
-    if certainty > certainty_threshold and certainty != last_predict:
-        #print prediction
-        print(Fore.GREEN + str(number) + Fore.CYAN + ", " + str(certainty) + "% certainty")
+    return number
 
-        #store certainy to avoid printing again
-        last_predict = certainty
 
-        return number
-    
-    #return -1 in case of no valid prediction
-    return -1
+def setArray(index):
+    global inputArray
+
+    (x_train, y_train), (x_test, y_test) = mnist.load_data()
+    x_train, y_train = mn.preprocess_data(x_train, y_train, 1000)
+    x_test, y_test = mn.preprocess_data(x_test, y_test, 20)
+
+    inputArray = inputArray.reshape(784, 1)
+    inputArray = inputArray.astype("float32")
+
+    inputArray = x_train[index]
+
+    inputArray = inputArray.reshape(28, 28)
 
 
 
@@ -124,17 +117,23 @@ def mousePressed(button):
         for y in range(28):
             mousex, mousey = pygame.mouse.get_pos()
             if (mousex > (x*20)) and (mousex < (x*20) + 19) and (mousey > (y*20)) and (mousey < (y*20) + 19):
+
+                #check for left click
                 if button == 0:
                     inputArray[y][x] = 1.0
                     try:
+                        #draw on array
                         inputArray[y+1][x+1] = 1.0
                         inputArray[y+1][x] = 1.0
                         inputArray[y][x+1] = 1.0
                     except:
                         pass
+
+                #check for left click
                 if button == 1:
                     inputArray[y][x] = 0.0
                     try:
+                        #erase from array
                         inputArray[y+1][x+1] = 0.0
                         inputArray[y+1][x] = 0.0
                         inputArray[y][x+1] = 0.0
@@ -169,6 +168,9 @@ while appRunning:
                 print(Fore.RED + "EXIT")
             if event.key == pygame.K_RETURN:
                 initMnist(int(input("Epochs: ")))
+            if event.key == pygame.K_0:
+                setArray(trainingSetCounter)
+                trainingSetCounter += 3
                 
         
 
