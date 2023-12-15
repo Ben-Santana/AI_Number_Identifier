@@ -143,13 +143,8 @@ def mousePressed(button):
 
 def update():
     predictRepeat()
-    pass
-
-
-def draw():
     drawInputArray()
     pass
-
 
 
 while appRunning:
@@ -175,7 +170,6 @@ while appRunning:
         
 
     update()
-    draw()
 
     pygame.display.flip()
 
