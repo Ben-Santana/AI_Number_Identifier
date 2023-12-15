@@ -94,7 +94,7 @@ def mnistPredict():
     #return prediction
     return number
 
-
+# sets input array to given index of training data from MNIST
 def setArray(index):
     global inputArray
 

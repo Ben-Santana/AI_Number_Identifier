@@ -1,14 +1,6 @@
 import numpy as np
 import json
 
-# Dense Layer --- Where all nodes in each layer are connected to all nodes in the next layer.
-# Activation Layer --- Translates nodes into a value between -1 and 1
-# 
-# 
-# 
-# 
-# 
-
 class Layer:
     def __init__(self):
         self.input = None
@@ -81,6 +73,7 @@ def mse_prime(y_true, y_pred):
 
 
 #must have a 'saves.json' file
+#saves all weights and biases of a layer array(network) to a saves.json file
 def save(layers, filename='saves.json'):
     network_data = []
 
@@ -98,7 +91,7 @@ def save(layers, filename='saves.json'):
     with open(filename, 'w') as file:
         json.dump({"network": network_data}, file, indent=2)
         
-
+#loads weights and biases onto compatible layer array(network) from saves.json file
 def load(network, filename='saves.json'):
     with open(filename, 'r') as file:
         data = json.load(file)
