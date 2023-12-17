@@ -4,8 +4,10 @@ import numpy as np
 import pygame
 import random
 import mnist as mn
-import layer_def as ld
-import network as net
+
+from mll_library import layer_def as ld
+from mll_library import network as net
+
 from colorama import Fore, Back, Style
 
 from keras.datasets import mnist
